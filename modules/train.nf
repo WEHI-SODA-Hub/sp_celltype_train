@@ -7,23 +7,24 @@ nextflow.enable.dsl=2
 process processOne {	
 	cpus "${params.cpus}"
 	debug = true //turn to false to stop printing command stdout to screen
-	container "${params.ubuntu_container}"
-	publishDir "${params.outDir}/process1", mode: 'copy'
+	memory "1 GB"
 
 	// See: https://www.nextflow.io/docs/latest/process.html#inputs
 	// each input needs to be placed on a new line
 	input:
 	path cohort_ch
+	each preprocess_scheme
+	each balance_scheme
+	each bayescv_iteration
 
 	// See: https://www.nextflow.io/docs/latest/process.html#outputs
 	// each new output needs to be placed on a new line
 	output:
-	path ("processed_cohort.txt")
+	stdout
 	
 	// this is an example of some code to run in the code block 
 	script:
 	"""
-	cat ${params.input} | tr '[a-z]' '[A-Z]' \
-		> processed_cohort.txt
+	echo ${preprocess_scheme} ${balance_scheme} ${bayescv_iteration}
 	"""
 }

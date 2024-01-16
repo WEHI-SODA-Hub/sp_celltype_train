@@ -93,9 +93,13 @@ if ( params.help || params.input == false ){
 	
 	// Define input channels 
 	input = Channel.fromPath("${params.input}")
+	label_file = Channel.fromPath("${params.label_path}")
+	preprocess_schemes = Channel.from(params.preprocess_schemes.split(","))
+	balance_schemes = Channel.from(params.balance_schemes.split(","))
+	bayescv_iterations = Channel.from(params.bayescv_iterations.split(","))
 
 	// Run process 1 example
-	processOne(params.input)
+	processOne(params.input, preprocess_schemes, balance_schemes, bayescv_iterations)
 
 }}
 
