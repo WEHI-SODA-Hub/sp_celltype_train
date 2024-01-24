@@ -1,45 +1,25 @@
 #!/usr/bin/env nextflow
 
-/// To use DSL-2 will need to include this
+/// To use DSL-2
 nextflow.enable.dsl=2
 
-// =================================================================
-// main.nf is the pipeline script for a nextflow pipeline
-// Should contain the following sections:
-	// Import subworkflows
-	// Log info function
-	// Help function 
-	// Main workflow structure
-	// Some tests to check input data, essential arguments
-
-// Examples are included for each section. Remove them and replace
-// with project-specific code. For more information on nextflow see:
-// https://www.nextflow.io/docs/latest/index.html and the SIH Nextflow
-// upskilling repo @ INSERT REPO PATH 
-//
-// ===================================================================
-
 // Import subworkflows to be run in the workflow
-// Each of these is a separate .nf script saved in modules/
-// Add as many of these as you need. The example below will
-// look for the process called process in modules/moduleName.nf
-// Include { process } from './modules/moduleName'
-include { processOne } from './modules/train'
+include { TRAIN } from './modules/train'
 
-/// Print a header for your pipeline 
+/// Print a header 
 log.info """\
 
 =======================================================================================
-Name of the pipeline - nf 
+MIBI Training Pipeline - nf 
 =======================================================================================
 
-Created by the Sydney Informatics Hub, University of Sydney
+Created by Clair Marceux, WEHI
 
-Find documentation and more info @ GITHUB REPO DOT COM
+Find documentation and more info @ https://github.com/BioimageAnalysisCoreWEHI/MIBI-train-model/
 
 Cite this pipeline @ INSERT DOI
 
-Log issues @ GITHUB REPO DOT COM
+Log issues @ https://github.com/BioimageAnalysisCoreWEHI/MIBI-train-model/
 
 =======================================================================================
 Workflow run parameters 
@@ -59,10 +39,6 @@ workDir           : ${workflow.workDir}
 """
 
 /// Help function 
-// This is an example of how to set out the help function that 
-// will be run if run command is incorrect (if set in workflow) 
-// or missing/  
-
 def helpMessage() {
     log.info"""
   Usage:  nextflow run main.nf
@@ -71,7 +47,7 @@ def helpMessage() {
 		--label_file <cell_type_labels.csv>
 		--output_path <dir>
 		--preprocess_scheme logp1,poly
-		--balance_schemes ENN,TOMEK,ADASYN,SMOTEENN,SMOTE
+		--balance_schemes TOMEK,ADASYN,SMOTEENN,SMOTE
 		--bayescv_iterations 1,5,10,20
 		--classifier Xgboost
 		--options_toml <options.toml>
@@ -94,13 +70,9 @@ def helpMessage() {
 """.stripIndent()
 }
 
-/// Main workflow structure. Include some input/runtime tests here.
-// Make sure to comment what each step does for readability. 
-
 workflow {
-// Show help message if --help is run or if any required params are not 
-// provided at runtime
 
+	// Show help message if --help is run or if any required params are not provided at runtime
 	if ( params.help ||
 	     params.input == "" ||
 		 params.run_name == "" ||
@@ -112,7 +84,7 @@ workflow {
 		 params.options_toml == "" ||
 		 params.classifier == ""){
    
-	// Invoke the help function above and exit
+		// Invoke the help function above and exit
 		helpMessage()
 		exit 1
 
@@ -127,7 +99,7 @@ workflow {
 		balance_schemes = Channel.from(params.balance_schemes.split(","))
 		bayescv_iterations = Channel.from(params.bayescv_iterations.split(","))
 
-		// Run process 1 example
+		// Run training process
 		processOne(input, label_file, options_toml, preprocess_schemes, balance_schemes, bayescv_iterations)
 
 	}}
