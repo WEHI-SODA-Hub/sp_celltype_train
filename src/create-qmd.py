@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import seaborn as sns
 import getpass
-import toml
+import toml, json
 import tabulate
 
 def prepare_plot(y_test: pd.DataFrame, y_pred: pd.DataFrame, decoder: dict) -> Figure:
@@ -71,7 +71,7 @@ def prepare_classification_report(y_test: pd.DataFrame, y_pred: pd.DataFrame, de
     classification_report_ = classification_report(
         y_test, y_pred.iloc[:, 0], digits=5, output_dict=True
     )
-    classification_report_df = pd.DataFrame(classification_report_)
+    classification_report_df = pd.DataFrame(classification_report_).rename(columns=decoder)
 
     if not debug:
         classification_report_df = classification_report_df.rename(columns=decoder)
@@ -286,7 +286,8 @@ def main(decoder_path: str, options_toml: str, input_dirs: list, output_path: st
 
 These are the combinations you've provided to be used with the `poly` preprocess scheme.
 
-{print(tabulate.tabulate(combinations, combinations.keys(), tablefmt="github")+'\n')}
+{tabulate.tabulate(combinations, combinations.keys(), tablefmt="github")}
+
 """)
 
     for d in input_dirs:
