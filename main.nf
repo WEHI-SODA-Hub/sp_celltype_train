@@ -107,7 +107,7 @@ workflow {
 
 		decoder = Channel.fromPath(file("${params.decoder}"), checkIfExists: true)
 
-		report_ch = REPORT(results_ch.collect(), decoder)
+		report_ch = REPORT(results_ch.collect(), decoder, options_toml)
 
 	}}
 

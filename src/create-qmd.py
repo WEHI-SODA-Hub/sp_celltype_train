@@ -14,12 +14,14 @@ from sklearn.metrics import (
     confusion_matrix
 )
 
-import os
+import os, sys
 import json
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import seaborn as sns
 import getpass
+import toml
+import tabulate
 
 def prepare_plot(y_test: pd.DataFrame, y_pred: pd.DataFrame, decoder: dict) -> Figure:
 
@@ -200,6 +202,8 @@ author: {getpass.getuser()}
 date: now
 format:
   html:
+    toc: true
+    toc-location: left
     code-fold: true
     page-layout: full
     embed-resources: true
@@ -253,15 +257,37 @@ def print_section(input_path: str, decoder_path: str, output_path: str, debug: b
     print(f"Scoring tables for {label}\n:::")
 
 
-def main(decoder_path: str, input_dirs: list, output_path: str, debug: bool) -> None:
+def main(decoder_path: str, options_toml: str, input_dirs: list, output_path: str, debug: bool) -> None:
     """Driver function
 
     Args:
         input_path: path to the directory containing training outputs
+        options_toml: path to toml with preprocess options. used to print the poly combinations.
         decoder_path: path to the JSON decoder file
         output_path: path to the directory to store generated images"""
 
     print_header()
+
+    try:
+        options = toml.load(options_toml)
+    except FileNotFoundError:
+        print(f"Options TOML file not found at {options_toml}", file=sys.stderr)
+        sys.exit(2)
+
+    try:
+        combinations = options["preprocess_options"]["combinations"]
+    except KeyError:
+        print("Looks like preprocess_options.combionations isn't present!", file=sys.stderr)
+        sys.exit(1)
+
+    print(
+        f"""
+## Poly Preprocess combinations
+
+These are the combinations you've provided to be used with the `poly` preprocess scheme.
+
+{print(tabulate.tabulate(combinations, combinations.keys(), tablefmt="github")+'\n')}
+""")
 
     for d in input_dirs:
         print_section(d, decoder_path, output_path, debug)
@@ -284,6 +310,12 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument(
+        "--options-toml",
+        "-x",
+        help="TOML file containing training preprocess poly combinations to include in the report.",
+        required=True
+    )
+    parser.add_argument(
         "INPUT_DIRECTORIES",
         nargs="+",
         help="Directories containing MIBI training results.",
@@ -297,4 +329,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    main(args.decoder, args.INPUT_DIRECTORIES, args.output_dir, args.debug)
+    main(args.decoder, args.options_toml, args.INPUT_DIRECTORIES, args.output_dir, args.debug)

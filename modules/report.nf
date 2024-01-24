@@ -7,7 +7,7 @@ process REPORT {
 
     memory "4 GB"
     cpus 1
-    conda "quarto tabulate pandas=1.4.4 scikit-learn=1.1.1 seaborn=0.11.2 matplotlib=3.5.3"
+    conda "${projectDir}/environment.yml"
     time "30min"
     label "report"
     publishDir "${params.output_path}", mode: 'copy'
@@ -15,6 +15,7 @@ process REPORT {
     input:
     path input_data
     path decoder
+    path toml
 
     output:
     path "assess.html"
@@ -24,6 +25,7 @@ process REPORT {
     python3 ${projectDir}/src/create-qmd.py \\
         --decoder ${decoder} \\
         --output-dir . \\
+        --options-toml ${toml} \\
         -d \\
         ${input_data} > assess.qmd
     
