@@ -5,6 +5,7 @@ nextflow.enable.dsl=2
 
 // Import subworkflows to be run in the workflow
 include { TRAIN } from './modules/train'
+include { REPORT } from './modules/report'
 
 /// Print a header 
 log.info """\
@@ -33,6 +34,7 @@ balance_schemes   : ${params.balance_schemes}
 bayescv_iterations: ${params.bayescv_iterations}
 options_toml      : ${params.options_toml}
 classifier        : ${params.classifier}
+decoder           : ${params.decoder}
 workDir           : ${workflow.workDir}
 =======================================================================================
 
@@ -82,6 +84,7 @@ workflow {
 		 params.balance_schemes == "" ||
 		 params.bayescv_iterations == "" ||
 		 params.options_toml == "" ||
+		 params.decoder == "" ||
 		 params.classifier == ""){
    
 		// Invoke the help function above and exit
@@ -100,7 +103,11 @@ workflow {
 		bayescv_iterations = Channel.from(params.bayescv_iterations.split(","))
 
 		// Run training process
-		processOne(input, label_file, options_toml, preprocess_schemes, balance_schemes, bayescv_iterations)
+		results_ch = TRAIN(input, label_file, options_toml, preprocess_schemes, balance_schemes, bayescv_iterations)
+
+		decoder = Channel.fromPath(file("${params.decoder}"), checkIfExists: true)
+
+		report_ch = REPORT(results_ch.collect(), decoder)
 
 	}}
 
