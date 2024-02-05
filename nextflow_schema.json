@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://raw.githubusercontent.com/MIBI-train-model/pipeline/nextflow_schema.json",
+  "title": "MIBI-train-model pipeline parameters",
+  "description": "Sub pipeline within the MIBI pipeline to train the XGBoost classiffier model using preprocessed output from QuPath.",
+  "type": "object",
+  "definitions": {
+    "generic_options": {
+      "title": "Generic options",
+      "type": "object",
+      "fa_icon": "fas fa-file-import",
+      "description": "Less common options for the pipeline, typically set in a config file.",
+      "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
+      "properties": {
+        "help": {
+          "type": "boolean",
+          "description": "Display help text.",
+          "fa_icon": "fas fa-question-circle",
+          "hidden": true
+        },
+        "version": {
+          "type": "boolean",
+          "description": "Display version and exit.",
+          "fa_icon": "fas fa-question-circle",
+          "hidden": true,
+          "default": 0.1
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "#/definitions/generic_options"
+    }
+  ],
+  "properties": {
+    "run_name": {
+      "type": "string",
+      "description": "Run name used to label output files."
+    },
+    "input": {
+      "type": "string",
+      "format": "file-path",
+      "description": "Path to preprocessed input data file from QuPath.",
+      "exists": true
+    },
+    "label_file": {
+      "type": "string",
+      "format": "file-path",
+      "description": "Path to file containing cell type labels.",
+      "exists": true
+    },
+    "output_path": {
+      "type": "string",
+      "format": "directory-path",
+      "description": "Path to directory to store the output report. The folder will be created if it doesn't already exist."
+    },
+    "qupath_data": {
+      "type": "string",
+      "format": "file-path",
+      "description": "The raw data exported from QuPath to be preprocessed.",
+      "exists": true
+    },
+    "cell_types_to_remove": {
+      "type": "string",
+      "description": "A comma-delimited list of cell types identified that you wish to remove. E.g., \"B cells,CD4 T cells\"."
+    },
+    "preprocess_schemes": {
+      "type": "string",
+      "description": "A comma-delimited list of the schemes to use to transform the input data. E.g., \"SMOTEENN,SMOTE\".",
+      "default": "TOMEK,ADASYN,SMOTEENN,SMOTE"
+    },
+    "balance_schemes": {
+      "type": "string",
+      "description": "A comma-delimited list of the balance schemes to use. E.g., \"null,poly\".",
+      "default": "null,logp1,poly"
+    },
+    "bayescv_iterations": {
+      "type": "string",
+      "description": "A comma-delimited list of the number of BayesCV itations to use. E.g., \"5,10\".",
+      "default": "1,3,5,10"
+    },
+    "classifier": {
+      "type": "string",
+      "description": "Name of the classifier to train.",
+      "default": "XGBoost",
+      "hidden": true
+    },
+    "before_script": {
+      "type": "string",
+      "default": "module load miniconda3",
+      "hidden": true
+    }
+  },
+  "required": ["batch_name", "output_folder", "qupath_data"]
+}

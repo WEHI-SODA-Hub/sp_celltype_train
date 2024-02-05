@@ -1,0 +1,3 @@
+reports:
+  *-assess.html:
+    display: "Training assessment report"
