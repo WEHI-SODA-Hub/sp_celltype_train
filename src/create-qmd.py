@@ -26,7 +26,7 @@ import tabulate
 def prepare_plot(y_test: pd.DataFrame, y_pred: pd.DataFrame, decoder: dict) -> Figure:
 
     # create figure and subplots
-    fig, axs = plt.subplots(1, 2, figsize=(20, 10), dpi=300, sharey=True)
+    fig, axs = plt.subplots(1, 2, figsize=(20, 10), dpi=75, sharey=True)
 
     # create raw confusion matrix
     phenotypes = y_test.iloc[:, 0].unique()
