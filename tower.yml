@@ -1,3 +1,3 @@
 reports:
-  *-assess.html:
+  "*-assess.html":
     display: "Training assessment report"

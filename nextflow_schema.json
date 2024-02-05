@@ -55,25 +55,15 @@
       "format": "directory-path",
       "description": "Path to directory to store the output report. The folder will be created if it doesn't already exist."
     },
-    "qupath_data": {
-      "type": "string",
-      "format": "file-path",
-      "description": "The raw data exported from QuPath to be preprocessed.",
-      "exists": true
-    },
-    "cell_types_to_remove": {
-      "type": "string",
-      "description": "A comma-delimited list of cell types identified that you wish to remove. E.g., \"B cells,CD4 T cells\"."
-    },
     "preprocess_schemes": {
       "type": "string",
-      "description": "A comma-delimited list of the schemes to use to transform the input data. E.g., \"SMOTEENN,SMOTE\".",
-      "default": "TOMEK,ADASYN,SMOTEENN,SMOTE"
+      "description": "A comma-delimited list of the schemes to use to transform the input data. E.g., \"null,poly\".",
+      "default": "null,logp1,poly"
     },
     "balance_schemes": {
       "type": "string",
-      "description": "A comma-delimited list of the balance schemes to use. E.g., \"null,poly\".",
-      "default": "null,logp1,poly"
+      "description": "A comma-delimited list of the balance schemes to use. E.g., \"TOMEK,SMOTE\".",
+      "default": "TOMEK,ADASYN,SMOTEENN,SMOTE"
     },
     "bayescv_iterations": {
       "type": "string",
