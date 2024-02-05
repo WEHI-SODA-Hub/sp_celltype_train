@@ -136,7 +136,7 @@ if __name__ == "__main__":
         help="Path to TOML file containing preprocessing scheme and model classifier options.",
     )
     parser.add_argument(
-        "--classifier", "-c", help="Classifier to train.", choices=["Xgboost"]
+        "--classifier", "-c", help="Classifier to train.", choices=["Xgboost", "Xgboost-gpu"]
     )
     parser.add_argument(
         "--save-preprocessed",

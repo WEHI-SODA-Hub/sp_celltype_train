@@ -13,7 +13,7 @@ class ClassifierInitialiser:
 
     def __init__(self) -> None:
         self.optmiser = None
-        self.valid_scheme = {"Xgboost" : XgboostApplier}
+        self.valid_scheme = {"Xgboost" : XgboostApplier, "Xgboost-gpu" : XgboostApplierGPU}
         self.bayes_cv_tuner = None
 
     def tune_hyper_parameter(self, X : pd.DataFrame, y : pd.DataFrame, 
@@ -106,31 +106,48 @@ class ClassifierInitialiser:
                                             class_weight='balanced', 
                                             y=self.y
                                         ))
+    
+SEARCH_SPACE = {
+    'eta' : Real(1e-8, 1, 'log-uniform'),
+    'reg_alpha' : Real(1e-8, 1.0, 'log-uniform'),
+    'reg_lambda': Real(1e-8, 1000, 'log-uniform'),
+    'max_depth': Integer(0, 50, 'uniform'),
+    'n_estimators': Integer(10, 300, 'uniform'), 
+    'learning_rate': Real(1e-8, 1.0, 'log-uniform'),
+    'min_child_weight': Integer(0, 10, 'uniform'),
+    'max_delta_step': Integer(1, 100, 'uniform'),
+    'subsample': Real(1e-8, 1.0, 'uniform'),
+    'colsample_bytree': Real(1e-8, 1.0, 'uniform'),
+    'colsample_bylevel': (1e-8, 1.0, 'uniform'),
+    'gamma': Real(1e-8, 1.0, 'log-uniform'),
+    'min_child_weight': Integer(0, 5, 'uniform')
+}
 
 class XgboostApplier:
     
     def __init__(self, args : Dict) -> None:
         
-        self.search_space = {
-                        'eta' : Real(1e-8, 1, 'log-uniform'),
-                        'reg_alpha' : Real(1e-8, 1.0, 'log-uniform'),
-                        'reg_lambda': Real(1e-8, 1000, 'log-uniform'),
-                        'max_depth': Integer(0, 50, 'uniform'),
-                        'n_estimators': Integer(10, 300, 'uniform'), 
-                        'learning_rate': Real(1e-8, 1.0, 'log-uniform'),
-                        'min_child_weight': Integer(0, 10, 'uniform'),
-                        'max_delta_step': Integer(1, 100, 'uniform'),
-                        'subsample': Real(1e-8, 1.0, 'uniform'),
-                        'colsample_bytree': Real(1e-8, 1.0, 'uniform'),
-                        'colsample_bylevel': (1e-8, 1.0, 'uniform'),
-                        'gamma': Real(1e-8, 1.0, 'log-uniform'),
-                        'min_child_weight': Integer(0, 5, 'uniform')
-                    }
+        self.search_space = SEARCH_SPACE
         try:
             self.model = xgb.XGBClassifier(
                     n_jobs = args["N_JOBS_MODEL"],
                     objective = args["OBJECTIVE_FUNC"],
-                    tree_method='hist'
+                    tree_method= "hist"
+                )
+        except:
+            # TODO: Raise an error
+            pass
+
+class XgboostApplierGPU:
+    
+    def __init__(self, args : Dict) -> None:
+        
+        self.search_space = SEARCH_SPACE
+        try:
+            self.model = xgb.XGBClassifier(
+                    n_jobs = args["N_JOBS_MODEL"],
+                    objective = args["OBJECTIVE_FUNC"],
+                    tree_method= "gpu_hist"
                 )
         except:
             # TODO: Raise an error
