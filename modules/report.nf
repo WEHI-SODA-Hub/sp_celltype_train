@@ -18,18 +18,66 @@ process REPORT {
     path toml
 
     output:
-    path "${params.run_name}-assess.html"
+    path "*-assess.html"
 
-    script:
-    """
-    python3 ${projectDir}/src/create-qmd.py \\
-        --decoder ${decoder} \\
-        --output-dir . \\
-        --options-toml ${toml} \\
-        -d \\
-        ${input_data} > "${params.run_name}-assess.qmd"
+    shell:
+    '''
+    # collate each field
+    unique_preprocessing_schemes=$(for diri in *-*-*-*; do echo ${diri} | cut -d '-' -f 2; done | sort -u)
+    unique_balance_schemes=$(for diri in *-*-*-*; do echo ${diri} | cut -d '-' -f 3; done | sort -u)
+    unique_bayescv_iterations=$(for diri in *-*-*-*; do echo ${diri} | cut -d '-' -f 4; done | sort -u)
+
+    # create reports for balance schemes
+    for pp_scheme in $unique_preprocessing_schemes;
+    do
+        for b_iter in $unique_bayescv_iterations;
+        do
+            reportname="!{params.run_name}-ALL_BALANCE_SCHEMES-${pp_scheme}-${b_iter}-assess"
+            python3 !{projectDir}/src/create-qmd.py \\
+                --decoder !{decoder} \\
+                --output-dir . \\
+                --options-toml !{toml} \\
+                -d \\
+                $(ls -d !{params.run_name}-${pp_scheme}-*-${b_iter}/) > "$reportname.qmd"
     
-    quarto render "${params.run_name}-assess.qmd" --to html
-    """
+                quarto render "$reportname.qmd" --to html
+        done
+    done
+
+    # create reports for preprocessing schemes
+    for b_scheme in $unique_balance_schemes;
+    do
+        for b_iter in $unique_bayescv_iterations;
+        do
+            reportname="!{params.run_name}-ALL_PREPROCESSING_SCHEMES-${b_scheme}-${b_iter}-assess"
+            python3 !{projectDir}/src/create-qmd.py \\
+                --decoder !{decoder} \\
+                --output-dir . \\
+                --options-toml !{toml} \\
+                -d \\
+                $(ls -d !{params.run_name}-*-${b_scheme}-${b_iter}/) > "$reportname.qmd"
+    
+                quarto render "$reportname.qmd" --to html
+        done
+    done
+
+    # create reports for bayescv iterations
+    for b_scheme in $unique_balance_schemes;
+    do
+        for pp_scheme in $unique_preprocessing_schemes;
+        do
+            reportname="!{params.run_name}-ALL_BAYESCV_ITERATIONS-${b_scheme}-${pp_scheme}-assess"
+            python3 !{projectDir}/src/create-qmd.py \\
+                --decoder !{decoder} \\
+                --output-dir . \\
+                --options-toml !{toml} \\
+                -d \\
+                $(ls -d !{params.run_name}-${pp_scheme}-${b_scheme}-*/) > "$reportname.qmd"
+    
+                quarto render "$reportname.qmd" --to html
+        done
+    done
+
+    '''
 
 }

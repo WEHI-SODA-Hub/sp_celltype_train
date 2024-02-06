@@ -214,7 +214,7 @@ format:
 
 
 def print_section(input_path: str, decoder_path: str, output_path: str, debug: bool) -> None:
-    label = os.path.basename(input_path)
+    label = os.path.basename(input_path.rstrip("/"))
     """prints markdown section related to the supplied results
     
     Args:
