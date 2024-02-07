@@ -145,7 +145,7 @@ class XgboostApplierGPU:
         self.search_space = SEARCH_SPACE
         try:
             self.model = xgb.XGBClassifier(
-                    n_jobs = args["N_JOBS_MODEL"],
+                    n_jobs = 2,
                     objective = args["OBJECTIVE_FUNC"],
                     tree_method= "gpu_hist"
                 )
