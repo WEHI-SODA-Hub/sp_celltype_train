@@ -38,7 +38,7 @@ process REPORT {
                 --output-dir . \\
                 --options-toml !{toml} \\
                 -d \\
-                $(ls -d !{params.run_name}-${pp_scheme}-*-${b_iter}/) > "$reportname.qmd"
+                $(ls -d !{params.run_name}-${pp_scheme}-*-${b_iter}/) >> "$reportname.qmd"
     
                 quarto render "$reportname.qmd" --to html
         done
@@ -55,7 +55,7 @@ process REPORT {
                 --output-dir . \\
                 --options-toml !{toml} \\
                 -d \\
-                $(ls -d !{params.run_name}-*-${b_scheme}-${b_iter}/) > "$reportname.qmd"
+                $(ls -d !{params.run_name}-*-${b_scheme}-${b_iter}/) >> "$reportname.qmd"
     
                 quarto render "$reportname.qmd" --to html
         done
@@ -72,7 +72,7 @@ process REPORT {
                 --output-dir . \\
                 --options-toml !{toml} \\
                 -d \\
-                $(ls -d !{params.run_name}-${pp_scheme}-${b_scheme}-*/) > "$reportname.qmd"
+                $(ls -d !{params.run_name}-${pp_scheme}-${b_scheme}-*/) >> "$reportname.qmd"
     
                 quarto render "$reportname.qmd" --to html
         done
