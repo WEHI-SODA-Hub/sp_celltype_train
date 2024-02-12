@@ -100,7 +100,7 @@ workflow {
 		options_toml = Channel.fromPath(file("${params.options_toml}"), checkIfExists: true)
 		preprocess_schemes = Channel.from(params.preprocess_schemes.split(","))
 		balance_schemes = Channel.from(params.balance_schemes.split(","))
-		bayescv_iterations = Channel.from(params.bayescv_iterations.split(","))
+		bayescv_iterations = Channel.from((params.bayescv_iterations+"").split(","))
 
 		// Run training process
 		results_ch = TRAIN(input, label_file, options_toml, preprocess_schemes, balance_schemes, bayescv_iterations)
