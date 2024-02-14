@@ -34,12 +34,12 @@
                     "exists": true,
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
-                    "description": "Path to comma-separated file containing information about the samples in the experiment. E.g., /stornext/Home/data/allstaff/y/yang.e/batch1_preprocessed_input_data.csv",
+                    "description": "Path to comma-separated file containing information about the samples in the experiment. E.g., /home/users/allstaff/<username>/batch1_preprocessed_input_data.csv",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "label_file": {
                     "type": "string",
-                    "description": "File containing cell type labels. E.g., /stornext/Home/data/allstaff/y/yang.e/batch1_cell_type_labels.csv",
+                    "description": "File containing cell type labels. E.g., /home/users/allstaff/<username>/batch1_cell_type_labels.csv",
                     "fa_icon": "fas fa-file-csv",
                     "pattern": "^\\S+\\.csv$",
                     "format": "file-path",
@@ -47,7 +47,7 @@
                 },
                 "output_path": {
                     "type": "string",
-                    "description": "Path to directory to store output files. E.g., /vast/scratch/users/yang.e/batch1-results",
+                    "description": "Path to directory to store output files. E.g., /home/users/allstaff/<username>/batch1-results",
                     "fa_icon": "fas fa-folder",
                     "format": "directory-path"
                 },
@@ -68,14 +68,14 @@
                 },
                 "options_toml": {
                     "type": "string",
-                    "description": "TOML file containing preprocessing scheme and model classifier options. E.g., /stornext/Home/data/allstaff/y/yang.e/batch1-options.toml",
+                    "description": "TOML file containing preprocessing scheme and model classifier options. E.g., /home/users/allstaff/<username>/batch1-options.toml",
                     "fa_icon": "fas fa-file-alt",
                     "pattern": "^\\S+\\.toml$",
                     "format": "file-path"
                 },
                 "decoder": {
                     "type": "string",
-                    "description": "JSON file containing the decoder for the predicted cell types. E.g., /stornext/Home/data/allstaff/y/yang.e/batch1_decoder.json",
+                    "description": "JSON file containing the decoder for the predicted cell types. E.g., /home/users/allstaff/<username>/batch1_decoder.json",
                     "fa_icon": "fas fa-file-alt",
                     "pattern": "^\\S+\\.json$",
                     "format": "file-path",
