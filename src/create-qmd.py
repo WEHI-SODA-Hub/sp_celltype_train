@@ -11,7 +11,7 @@ from sklearn.metrics import (
     matthews_corrcoef,
     log_loss,
     classification_report,
-    confusion_matrix
+    confusion_matrix,
 )
 
 import os, sys
@@ -23,8 +23,8 @@ import getpass
 import toml, json
 import tabulate
 
-def prepare_plot(y_test: pd.DataFrame, y_pred: pd.DataFrame, decoder: dict) -> Figure:
 
+def prepare_plot(y_test: pd.DataFrame, y_pred: pd.DataFrame, decoder: dict) -> Figure:
     # create figure and subplots
     fig, axs = plt.subplots(1, 2, figsize=(20, 10), dpi=75, sharey=True)
 
@@ -66,12 +66,16 @@ def prepare_plot(y_test: pd.DataFrame, y_pred: pd.DataFrame, decoder: dict) -> F
 
     return fig
 
-def prepare_classification_report(y_test: pd.DataFrame, y_pred: pd.DataFrame, decoder: dict, debug: bool) -> pd.DataFrame:
 
+def prepare_classification_report(
+    y_test: pd.DataFrame, y_pred: pd.DataFrame, decoder: dict, debug: bool
+) -> pd.DataFrame:
     classification_report_ = classification_report(
         y_test, y_pred.iloc[:, 0], digits=5, output_dict=True
     )
-    classification_report_df = pd.DataFrame(classification_report_).rename(columns=decoder)
+    classification_report_df = pd.DataFrame(classification_report_).rename(
+        columns=decoder
+    )
 
     if not debug:
         classification_report_df = classification_report_df.rename(columns=decoder)
@@ -84,7 +88,10 @@ def prepare_classification_report(y_test: pd.DataFrame, y_pred: pd.DataFrame, de
 
     return classification_report_df.T
 
-def calculate_overall_scores(y_test: pd.DataFrame, y_pred: pd.DataFrame, debug: bool) -> pd.DataFrame:
+
+def calculate_overall_scores(
+    y_test: pd.DataFrame, y_pred: pd.DataFrame, debug: bool
+) -> pd.DataFrame:
     """Calculates various scores based on predicted vs test values
 
     Args:
@@ -150,7 +157,10 @@ def calculate_overall_scores(y_test: pd.DataFrame, y_pred: pd.DataFrame, debug: 
             index=["Score"],
         ).T
 
-def process_input(label: str, input_path: str, decoder_path: str, output_path: str, debug: bool) -> tuple:
+
+def process_input(
+    label: str, input_path: str, decoder_path: str, output_path: str, debug: bool
+) -> tuple:
     """Produces a markdown report for evaluating MIBI training schemes
 
     Args:
@@ -171,21 +181,25 @@ def process_input(label: str, input_path: str, decoder_path: str, output_path: s
         decoder = json.load(json_file)
 
     fig = prepare_plot(y_test, y_pred, decoder)
-    
+
     output_image_path = os.path.join(
         output_path, f"cell_type_confusion_matrices_{label}.png"
     )
-    
+
     fig.savefig(output_image_path)
 
-    classification_report_df = prepare_classification_report(y_test, y_pred, decoder, debug)
+    classification_report_df = prepare_classification_report(
+        y_test, y_pred, decoder, debug
+    )
 
     overall_score_df = calculate_overall_scores(y_test, y_pred, debug)
 
     if debug:
-        classification_report_df.to_csv(os.path.join(output_path, f"{label}_classification_report.csv"))
+        classification_report_df.to_csv(
+            os.path.join(output_path, f"{label}_classification_report.csv")
+        )
         overall_score_df.to_csv(os.path.join(output_path, f"{label}_overall_score.csv"))
-    
+
     return (
         output_image_path,
         classification_report_df.to_markdown(),
@@ -213,7 +227,9 @@ format:
     )
 
 
-def print_section(input_path: str, decoder_path: str, output_path: str, debug: bool) -> None:
+def print_section(
+    input_path: str, decoder_path: str, output_path: str, debug: bool
+) -> None:
     label = os.path.basename(input_path.rstrip("/"))
     """prints markdown section related to the supplied results
     
@@ -257,7 +273,13 @@ def print_section(input_path: str, decoder_path: str, output_path: str, debug: b
     print(f"Scoring tables for {label}\n:::")
 
 
-def main(decoder_path: str, options_toml: str, input_dirs: list, output_path: str, debug: bool) -> None:
+def main(
+    decoder_path: str,
+    options_toml: str,
+    input_dirs: list,
+    output_path: str,
+    debug: bool,
+) -> None:
     """Driver function
 
     Args:
@@ -277,7 +299,10 @@ def main(decoder_path: str, options_toml: str, input_dirs: list, output_path: st
     try:
         combinations = options["preprocess_options"]["combinations"]
     except KeyError:
-        print("Looks like preprocess_options.combionations isn't present!", file=sys.stderr)
+        print(
+            "Looks like preprocess_options.combionations isn't present!",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     print(
@@ -288,7 +313,8 @@ These are the combinations you've provided to be used with the `poly` preprocess
 
 {tabulate.tabulate(combinations, combinations.keys(), tablefmt="github")}
 
-""")
+"""
+    )
 
     for d in input_dirs:
         print_section(d, decoder_path, output_path, debug)
@@ -314,7 +340,7 @@ if __name__ == "__main__":
         "--options-toml",
         "-x",
         help="TOML file containing training preprocess poly combinations to include in the report.",
-        required=True
+        required=True,
     )
     parser.add_argument(
         "INPUT_DIRECTORIES",
@@ -325,9 +351,15 @@ if __name__ == "__main__":
         "--debug",
         "-d",
         action="store_true",
-        help="Turns on debug mode, which writes results to csv for validation."
+        help="Turns on debug mode, which writes results to csv for validation.",
     )
 
     args = parser.parse_args()
 
-    main(args.decoder, args.options_toml, args.INPUT_DIRECTORIES, args.output_dir, args.debug)
+    main(
+        args.decoder,
+        args.options_toml,
+        args.INPUT_DIRECTORIES,
+        args.output_dir,
+        args.debug,
+    )

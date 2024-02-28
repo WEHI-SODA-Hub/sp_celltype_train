@@ -117,7 +117,7 @@ if __name__ == "__main__":
         "-s",
         help="The scheme to use to transform the input data.",
         choices=["null", "logp1", "poly"],
-        default="null"
+        default="null",
     )
     parser.add_argument(
         "--balance-scheme",
@@ -137,7 +137,10 @@ if __name__ == "__main__":
         help="Path to TOML file containing preprocessing scheme and model classifier options.",
     )
     parser.add_argument(
-        "--classifier", "-c", help="Classifier to train.", choices=["Xgboost", "Xgboost-gpu"]
+        "--classifier",
+        "-c",
+        help="Classifier to train.",
+        choices=["Xgboost", "Xgboost-gpu"],
     )
     parser.add_argument(
         "--save-preprocessed",
