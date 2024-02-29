@@ -45,6 +45,9 @@ Parameters:
   --classifier			Classifier to train. Can be XGBoost or XGBoost-gpu.
 ```
 
+If you wish to use the GPU-accelerated version on WEHI's HPC, run the pipeline with the additional 
+flag `-profile wehi_gpu`.
+
 If you feel comfortable with the command line, you can run the preprocessing Python script directly.
 However, the script does not run combinations of parameters in parallel, just a single combination.
 
