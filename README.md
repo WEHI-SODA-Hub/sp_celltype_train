@@ -122,8 +122,8 @@ model to use moving forward. The reports will be copied to where you specify as 
 using the Python script directly, the report will be printed to the terminal in markdown format.
 
 The models themselves are stored as pickle files and the directory containing the models will be
-recorded in the report. The model will be saved as `final_model.sav` e.g., 
-`<process directory>/<name>-logp1-ADASYN-1/final_model.sav`.
+recorded in the report. The model will be saved as `bayes_cv_model.sav` e.g., 
+`<process directory>/<name>-logp1-ADASYN-1/bayes_cv_model.sav`.
 
 ## Credits 
 
