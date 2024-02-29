@@ -123,7 +123,7 @@ if __name__ == "__main__":
         "--balance-scheme",
         "-b",
         help="The scheme to use to balance the input data.",
-        choices=["ENN", "TOMEK", "ADASYN", "SMOTEENN", "SMOTE"],
+        choices=["ENN", "TOMEK", "ADASYN", "SMOTEENN", "SMOTE", "SMOTETOMEK", "RUS"],
     )
     parser.add_argument(
         "--bayescv-iterations",
