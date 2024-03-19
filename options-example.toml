@@ -1,0 +1,26 @@
+
+[model_options]
+SPLIT_RANDOM_STATE = 42
+TEST_SIZE = 0.2
+
+[model_options.CLASSIFIER_OPTIONS]
+N_JOBS_MODEL = 14
+OBJECTIVE_FUNC = "multi:softprob"
+TREE_METHOD = "hist"
+
+[model_options.BAYESCV_OPTIONS]
+N_JOBS = -1
+SCORING = "balanced_accuracy"
+
+[preprocess_options]
+degree = 2
+interaction_only = true
+
+[preprocess_options.combinations]
+"CD T cells" = ["CD4: Cell: Mean", "CD3: Cell: Mean", "CD45RO: Cell: Mean"]
+"Treg cells" = ["CD4: Cell: Mean", "CD3: Cell: Mean", "Foxp3: Nucleus: Mean"]
+"yd T cells" = ["CD4: Cell: Mean", "CD8a: Cell: Mean", "CD3: Cell: Mean", "dTCR: Cell: Mean"]
+"CD8 T cells" = ["CD8a: Cell: Mean", "CD3: Cell: Mean", "CD45RO: Cell: Mean"]
+"Macrophages" = [ "CD68: Cell: Mean", "CD16: Cell: Mean", "CD14: Cell: Mean", "MHC II (HLA-DR): Cell: Mean", "CD163: Cell: Mean", "CD206: Cell: Mean"]
+"Dendritic cells" = [ "CD11c: Cell: Mean", "CD16: Cell: Mean", "CD14: Cell: Mean", "MHC II (HLA-DR): Cell: Mean", "CD103: Cell: Mean"]
+"Granulocytes" = ["CD66b: Cell: Mean", "CD14: Cell: Mean", "CD16: Cell: Mean"]
