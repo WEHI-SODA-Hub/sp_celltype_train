@@ -1,0 +1,19 @@
+
+[model_options]
+SPLIT_RANDOM_STATE = 42
+TEST_SIZE = 0.2
+
+[model_options.CLASSIFIER_OPTIONS]
+N_JOBS_MODEL = 14
+OBJECTIVE_FUNC = "binary:logistic"
+TREE_METHOD = "hist"
+
+[model_options.BAYESCV_OPTIONS]
+N_JOBS = -1
+SCORING = "roc_auc"
+
+[preprocess_options]
+degree = 2
+interaction_only = true
+
+[preprocess_options.combinations]
