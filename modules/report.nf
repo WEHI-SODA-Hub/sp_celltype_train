@@ -78,6 +78,10 @@ process REPORT {
         done
     done
 
+    python3 !{projectDir}/scripts/aggregate-scores.py > aggregated-scores.qmd
+
+    quarto render aggregated-scores.qmd --to html
+
     '''
 
 }
