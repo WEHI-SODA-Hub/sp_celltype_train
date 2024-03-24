@@ -1,58 +1,53 @@
 #!/usr/bin/env python3
 
-import pandas as pd
+import pandas as pd, numpy as np
 import glob, os, getpass
 
-def transform_csv(fname):
+CELL_STATS = ("precision", "recall")
+CELL_OVERALL_STATS = ("accuracy", "macro avg", "weighted avg")
 
-    df = pd.read_csv(fname, index_col=0).T
+def process_classification_report(fpath):
 
-    # fname will always be <prefix>-<preprocessing scheme>-<balance scheme>-<BayesCV iterations>_classification_report.csv (or _overall_score.csv)
-    sections = fname.split("-")
-    df.insert(0, "BayesCV iterations", sections[-1].split("_")[0])
-    df.insert(0, "Balance scheme", sections[-2])
-    df.insert(0, "Preprocessing scheme", sections[-3])
+    df = pd.read_csv(fpath, index_col=0).T.loc[CELL_STATS, :]
 
-    df.columns
+    mask = ~df.columns.isin(CELL_OVERALL_STATS)
+    s = df.loc[CELL_STATS, mask].unstack()
+    
+    sections = fpath.split("-")
+    bcv_iters = sections[-1].split("_")[0]
+    bscheme = sections[-2]
+    ppscheme = sections[-3]
+    s.name = " ".join((ppscheme, bscheme, bcv_iters))
 
-    return df
+    return s
 
-def process_csvs(input_dir):
+def highlight_max(s, props=""):
+    return np.where(s==np.nanmax(s.values), props, None)
+    
+def print_aggregated_classification(csvs):
 
-    overall_score_files = glob.iglob(os.path.join(input_dir, '*_overall_score.csv'))
-    classification_report_files = glob.iglob(os.path.join(input_dir, '*_overall_score.csv'))
-
-    overall_score_df = pd.concat(
-        [transform_csv(f) for f in overall_score_files], 
-        axis=0
+    aggregated_df = pd.concat(
+        [process_classification_report(f) for f in csvs],
+        axis=1
     )
-    classification_report_df = pd.concat(
-        [transform_csv(f) for f in classification_report_files],
-        axis=0
-    )
-
-    print(f"""---
-title: MIBI aggregated scores
-author: {getpass.getuser()}
-date: now
+    
+    s = aggregated_df.style.apply(highlight_max, props="color:green", axis=1)
+    print("""---
+title: MIBI training aggregated scores
 format:
   html:
+    number-sections: true
+    embed-resources: true
+    theme: cosmo
+    page-layout: full
     toc: true
     toc-location: left
-    code-fold: true
-    page-layout: full
-    embed-resources: true
----
+    fontsize: "8"
+---\n\n""", s.format(precision=4).to_html())
 
-# Classification Scores
+def print_aggregated_overrall(csvs):
 
-{classification_report_df.to_markdown(index=False, tablefmt="simple")}
-
-# Overall scores
-
-{overall_score_df.to_markdown(index=False, tablefmt="simple")}
-
-""")
+    print("overall: ", csvs)
 
 
 if __name__ == "__main__":
@@ -62,13 +57,22 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         "MIBI-aggregate-scores", 
         description="CLI utility to group produce a summary qmd report")
-
-    parser.add_argument(
-        "input_dir",
-        help="Directory containing the collection of *_classification_report.csv and *_overall_score.csv CSV files",
-        default="."
+    
+    subparsers = parser.add_subparsers(
+        title="score/report type", 
+        description="Type of scores/report to aggregate"
     )
+
+    cparser = subparsers.add_parser("classification-report")
+    cparser.add_argument("CSVs", nargs='+')
+    cparser.set_defaults(func=print_aggregated_classification)
+
+    oparser = subparsers.add_parser("overall-scores")
+    oparser.add_argument("CSVs", nargs='+')
+    oparser.set_defaults(func=print_aggregated_overrall)
 
     args = parser.parse_args()
 
-    process_csvs(args.input_dir)
+    args.func(args.CSVs)
+
+    # process_csvs(args.input_dir)
