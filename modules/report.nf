@@ -18,7 +18,7 @@ process REPORT {
     path toml
 
     output:
-    path "*-assess.html"
+    path "*.html"
 
     shell:
     '''
@@ -78,9 +78,15 @@ process REPORT {
         done
     done
 
-    python3 !{projectDir}/scripts/aggregate-scores.py > aggregated-scores.qmd
+    python3 !{projectDir}/scripts/create-qmd.py \\
+        --decoder !{decoder} \\
+        --output-dir . \\
+        --options-toml !{toml} \\
+        -d \\
+        --only-aggregated-stats \\
+        $(ls -d */) > !{params.run_name}-aggregated-scores.qmd
 
-    quarto render aggregated-scores.qmd --to html
+    quarto render !{params.run_name}-aggregated-scores.qmd --to html
 
     '''
 

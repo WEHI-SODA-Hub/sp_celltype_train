@@ -227,7 +227,7 @@ def _process_report_dfs(fpath, df_dict):
     s.index.names = ("Cell type", "Statistic")
 
     for stat in df_dict["overall"].index:
-        s.loc[("overall", stat)] = df_dict["overall"].loc[stat, "Score"]
+        s.loc[("overall", stat)] = df_dict["overall"].loc[stat, 0]
 
     return s
 def _highlight_max(s, props=""):
@@ -252,6 +252,7 @@ date: now
 format:
   html:
     page-layout: full
+    embed-resources: true
 ---
 """
 
@@ -334,7 +335,7 @@ Scoring tables for {label}
             axis=1
         )
 
-        style = cell_stats_df.style.text_gradient(cmap="RdYlGn", axis=1).set_table_styles([
+        style = cell_stats_df.style.set_table_styles([
             {'selector': 'th', 'props': [
                 ('background-color', '#f0f0f0'),  # Light gray header background
                 ('border', '1px solid #ddd'),    # Light gray borders
@@ -349,11 +350,8 @@ Scoring tables for {label}
 
         print(
             "# Aggregated statistics", 
-            "::: {{#tbl-panel}}", 
-            # cell_stats_df.reset_index().rename(columns={"level_0": "Cell type", "level_1": "Statistic"}).to_markdown(index=False), 
             style.format(precision=4).to_html(),
             "Aggregated overall and per cell-type prediction statistics.",
-            ":::",
             sep="\n\n"
         )
 

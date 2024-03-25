@@ -1,5 +1,5 @@
 reports:
   "*-assess.html":
     display: "Training assessment report"
-  "aggregated-scores.html":
+  "*-aggregated-scores.html":
     display: "Aggregated scores"
