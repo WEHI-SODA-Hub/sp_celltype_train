@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import pandas as pd
+import pandas as pd, numpy as np
 from sklearn.metrics import (
     f1_score,
     accuracy_score,
@@ -14,7 +14,7 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 
-import os, sys
+import os, sys, pathlib
 import json
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -206,6 +206,33 @@ def process_input(
         overall_score_df,
     )
 
+PER_CELL_STATS_COLUMNS = ("precision", "recall")
+OVERALL_STATS_COLUMNS = ("**accuracy**", "**macro avg**", "**weighted avg**")
+
+def _process_report_dfs(fpath, df_dict):
+
+    mask = ~df_dict["classification"].index.isin(OVERALL_STATS_COLUMNS)
+    cell_stats_df = df_dict["classification"].T.loc[
+        PER_CELL_STATS_COLUMNS, 
+        mask
+    ]
+
+    s = cell_stats_df.unstack()
+
+    fname_segmented = pathlib.Path(fpath).stem.split("-")
+    bcv_iters = fname_segmented[-1]
+    bscheme = fname_segmented[-2]
+    ppscheme = fname_segmented[-3]
+    s.name = " ".join((ppscheme, bscheme, bcv_iters))
+    s.index.names = ("Cell type", "Statistic")
+
+    for stat in df_dict["overall"].index:
+        s.loc[("overall", stat)] = df_dict["overall"].loc[stat, "Score"]
+
+    return s
+def _highlight_max(s, props=""):
+    return np.where(s==np.nanmax(s.values), props, None)
+
 class mibi_train_reporter:
 
     def __init__(self, combinations, decoder_path, output_dir=".", debug=False):
@@ -216,7 +243,17 @@ class mibi_train_reporter:
 
         self.sections = []
 
-        self.text_tables = {}
+        self.scores_dfs = {}
+
+        self.aggregated_stats_header = f"""---
+title: MIBI Assess Predictions Statistics Report"
+author: {getpass.getuser()}
+date: now
+format:
+  html:
+    page-layout: full
+---
+"""
 
         self.header = f"""---
 title: MIBI Assess Predictions Report
@@ -274,6 +311,11 @@ Scoring tables for {label}
             label, input_path, self.decoder_path, self.output_path, self.debug
         )
 
+        self.scores_dfs[input_path] = {
+            "classification": classification_report_df,
+            "overall": overall_scores_df
+        }
+
         mapping = {
             "label": label,
             "input_path": os.path.realpath(input_path),
@@ -285,12 +327,50 @@ Scoring tables for {label}
 
         self.sections.append(self.section_body.format_map(mapping))
 
+    def _aggregate_classification_scores(self):
+
+        cell_stats_df = pd.concat(
+            [_process_report_dfs(fpath, df_dict) for fpath, df_dict in self.scores_dfs.items()], 
+            axis=1
+        )
+
+        style = cell_stats_df.style.text_gradient(cmap="RdYlGn", axis=1).set_table_styles([
+            {'selector': 'th', 'props': [
+                ('background-color', '#f0f0f0'),  # Light gray header background
+                ('border', '1px solid #ddd'),    # Light gray borders
+                ('font-family', 'sans-serif'),
+                ('font-weight', 'bold')
+            ]},
+            {'selector': 'td', 'props': [
+                ('border', '1px solid #ddd'),    # Light gray borders
+                ('font-family', 'sans-serif')
+            ]}
+        ]).set_table_attributes('style="border-collapse: collapse"')  # Ensure table collapse
+
+        print(
+            "# Aggregated statistics", 
+            "::: {{#tbl-panel}}", 
+            # cell_stats_df.reset_index().rename(columns={"level_0": "Cell type", "level_1": "Statistic"}).to_markdown(index=False), 
+            style.format(precision=4).to_html(),
+            "Aggregated overall and per cell-type prediction statistics.",
+            ":::",
+            sep="\n\n"
+        )
+
     def print_report(self):
 
         print(self.header, sep="\n\n")
 
         for s in self.sections:
             print(s, sep="\n\n")
+
+        self._aggregate_classification_scores()
+
+    def print_aggregated_statistics_report(self):
+
+        print(self.aggregated_stats_header, sep="\n\n")
+
+        self._aggregate_classification_scores()
 
 
 def main(
@@ -299,6 +379,7 @@ def main(
     input_dirs: list,
     output_path: str,
     debug: bool,
+    only_aggregated_stats: bool,
 ) -> None:
     """Driver function
 
@@ -328,7 +409,10 @@ def main(
     for d in input_dirs:
         reporter.add_section(d)
 
-    reporter.print_report()
+    if only_aggregated_stats:
+        reporter.print_aggregated_statistics_report()
+    else:
+        reporter.print_report()
 
 
 if __name__ == "__main__":
@@ -364,6 +448,12 @@ if __name__ == "__main__":
         action="store_true",
         help="Turns on debug mode, which writes results to csv for validation.",
     )
+    parser.add_argument(
+        "--only-aggregated-stats",
+        "-a",
+        action="store_true",
+        help="Only prints the aggregate prediction statistics table (as well as relevant quarto headers)."
+    )
 
     args = parser.parse_args()
 
@@ -373,4 +463,5 @@ if __name__ == "__main__":
         args.INPUT_DIRECTORIES,
         args.output_dir,
         args.debug,
+        args.only_aggregated_stats
     )
