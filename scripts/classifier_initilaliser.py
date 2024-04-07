@@ -26,8 +26,7 @@ class ClassifierInitialiser:
         Fits training data to the bayes cv hyper paramter tuning
         """
         if classifier_scheme not in self.valid_scheme:
-            # TODO: raise a warning or error
-            return
+            raise RuntimeError(f"Classifer {classifier_scheme} is not a valid classifier scheme.")
         try:
             model_options = options["CLASSIFIER_OPTIONS"]
             balance_scheme = options["BALANCE_SCHEME"]
@@ -43,8 +42,8 @@ class ClassifierInitialiser:
             n_iter = bayescv_options["ITERATIONS"]
             scoring = bayescv_options["SCORING"]
         except:
-            # TODO: raise error
-            pass
+            # TODO: add more informative error message
+            raise RuntimeError("An error occurred when processing options. Perhaps a field is missing?")
 
         self.X = X
         self.y = y
@@ -92,12 +91,12 @@ class ClassifierInitialiser:
 
     def get_prediction_df(self) -> pd.DataFrame:
         """
-        Returns a dafaframe with the first column being the actual predictions
+        Returns a dataframe with the first column being the actual predictions
         and the following columns the probability for being each of the classes
         """
         if self.bayes_cv_tuner == None:
-            # TODO: Error message
-            return
+            # TODO: Make error message more informative
+            raise RuntimeError("The BayesCV Tuner is not valid!")
 
         y_pred_df = pd.DataFrame(self.bayes_cv_tuner.predict(self.X_test))
         y_proba_df = pd.DataFrame(self.bayes_cv_tuner.predict_proba(self.X_test))
@@ -109,8 +108,8 @@ class ClassifierInitialiser:
         Fits the entire data to the found hyper-paramters
         """
         if self.bayes_cv_tuner == None:
-            # TODO: Error message
-            return
+            # TODO: Make error message more informative
+            raise RuntimeError("The BayesCV Tuner is not valid!")
 
         return self.bayes_cv_tuner.best_estimator_.fit(
             self.X,
