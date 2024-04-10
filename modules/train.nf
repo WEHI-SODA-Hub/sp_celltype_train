@@ -8,7 +8,7 @@ process TRAIN {
 	memory "100 GB"
 	cpus 56
 	conda "${projectDir}/envs/environment.yml"
-	time "24h"
+	time "${params.walltime}"
 	label "train"
 
 	input:

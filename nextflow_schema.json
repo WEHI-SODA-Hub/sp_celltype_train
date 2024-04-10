@@ -85,6 +85,11 @@
                     "type": "string",
                     "description": "Classifier to train.",
                     "fa_icon": "fas fa-align-justify"
+                },
+                "walltime": {
+                    "type": "string",
+                    "default": "8h",
+                    "hidden": true
                 }
             }
         },
@@ -105,8 +110,7 @@
                     "type": "boolean",
                     "description": "Display version and exit.",
                     "fa_icon": "fas fa-question-circle",
-                    "hidden": true,
-                    "default": 0.1
+                    "hidden": true
                 }
             }
         }
