@@ -10,6 +10,7 @@ process TRAIN {
 	conda "${projectDir}/envs/environment.yml"
 	time "${params.walltime}"
 	label "train"
+	container "oras://ghcr.io/wehi-researchcomputing/mibi:0.1"
 
 	input:
 	path script
