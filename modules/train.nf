@@ -25,7 +25,7 @@ process TRAIN {
 	
 	script:
 	"""
-	python3 -u ${script} \\
+	python3 -B -u ${script} \\
 		--name ${params.run_name}-${preprocess_scheme}-${balance_scheme}-${bayescv_iteration} \\
 		--input ${input} \\
 		--labels ${label_file} \\
