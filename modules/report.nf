@@ -24,9 +24,9 @@ process REPORT {
     shell:
     '''
     # collate each field
-    unique_preprocessing_schemes=$(for diri in *-*-*-*/; do echo ${diri} | rev | cut -d '-' -f 3 | rev; done | sort -u)
-    unique_balance_schemes=$(for diri in *-*-*-*/; do echo ${diri} | rev | cut -d '-' -f 2 | rev; done | sort -u)
-    unique_bayescv_iterations=$(for diri in *-*-*-*/; do echo ${diri} | rev | cut -d '-' -f 1 | rev; done | sort -u)
+    unique_preprocessing_schemes=$(for diri in *-*-*-*/; do basename ${diri} | rev | cut -d '-' -f 3 | rev; done | sort -u)
+    unique_balance_schemes=$(for diri in *-*-*-*/; do basename ${diri} | rev | cut -d '-' -f 2 | rev; done | sort -u)
+    unique_bayescv_iterations=$(for diri in *-*-*-*/; do basename ${diri} | rev | cut -d '-' -f 1 | rev; done | sort -u)
 
     # create reports for balance schemes
     for pp_scheme in $unique_preprocessing_schemes;
