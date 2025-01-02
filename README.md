@@ -114,6 +114,27 @@ optional arguments:
   --debug, -d           Turns on debug mode, which writes results to csv for validation.
 ```
 
+### Example usage
+
+After preprocessing the test data as per [the preprocessing example](https://github.com/BioimageAnalysisCoreWEHI/MIBI-preprocess-data/blob/main/README.md#example-usage),
+To train/hyperparameter tune the model:
+
+```
+nextflow run main.nf \
+    --run_name test-train \
+    --input /tmp/mibi-test-run-output/test_preprocessed_input_data.csv \
+    --label_file /tmp/mibi-test-run-output/test_cell_type_labels.csv \
+    --output_path /tmp/mibi-test-run-output/ \
+    --preprocess_schemes null,poly \
+    --balance_schemes TOMEK \
+    --bayescv_iterations 1,3 \
+    --options_toml options-example.toml \
+    --decoder /tmp/mibi-test-run-output/test_decoder.json \
+    -profile wehi_gpu # For running on WEHI's GPUs, which is much faster than CPUs.
+```
+
+This will reuse the output folder used in the preprocessing example.
+
 ### Training options file
 
 As part of the training, an options TOML must be supplied. This file exposes some of the more
