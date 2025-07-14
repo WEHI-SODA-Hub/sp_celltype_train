@@ -47,7 +47,9 @@ def prepare_plot(y_test: pd.DataFrame, y_pred: pd.DataFrame, decoder: dict) -> F
     )
 
     # create normalized confusion matrix
-    cm_norm = cm / cm.astype(float).sum(axis=1)
+    #cm_norm = cm / cm.astype(float).sum(axis=1)
+    cm_norm = cm.astype(float) / cm.sum(axis=1, keepdims=True)
+
 
     # plot normalized confusion matrix
     plt.sca(axs[1])
