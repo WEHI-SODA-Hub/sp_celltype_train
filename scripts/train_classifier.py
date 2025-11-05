@@ -89,31 +89,16 @@ def train(
     y_train_df = classifier_applier.y_train_orig
     y_test_df = classifier_applier.y_test
     
-    if use_parquet:
-        # Parquet requires string column names - convert all column names to strings
-        y_pred_df.columns = y_pred_df.columns.astype(str)
-        y_train_df.columns = y_train_df.columns.astype(str)
-        y_test_df.columns = y_test_df.columns.astype(str)
-        
-        y_pred_df.to_parquet(
-            os.path.join(full_output_directory, "y_predicted.parquet"), index=False
-        )
-        y_train_df.to_parquet(
-            os.path.join(full_output_directory, "y_train.parquet"), index=False
-        )
-        y_test_df.to_parquet(
-            os.path.join(full_output_directory, "y_test.parquet"), index=False
-        )
-    else:
-        y_pred_df.to_csv(
-            os.path.join(full_output_directory, "y_predicted.csv"), index=False
-        )
-        y_train_df.to_csv(
-            os.path.join(full_output_directory, "y_train.csv"), index=False
-        )
-        y_test_df.to_csv(
-            os.path.join(full_output_directory, "y_test.csv"), index=False
-        )
+    # Always save prediction files as CSV for compatibility with reporting and downstream analysis
+    y_pred_df.to_csv(
+        os.path.join(full_output_directory, "y_predicted.csv"), index=False
+    )
+    y_train_df.to_csv(
+        os.path.join(full_output_directory, "y_train.csv"), index=False
+    )
+    y_test_df.to_csv(
+        os.path.join(full_output_directory, "y_test.csv"), index=False
+    )
 
     # Save the outputs
     print("INFO: Save the cross validation results")
