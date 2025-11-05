@@ -175,9 +175,24 @@ def process_input(
         A tuple consisting of the path to the output image, the markdown table with
         the classification table, and the markdown table containing accuracy scores.
     """
-    # reading data
-    y_test = pd.read_csv(os.path.join(input_path, "y_test.csv"))
-    y_pred = pd.read_csv(os.path.join(input_path, "y_predicted.csv"))
+    # reading data - auto-detect CSV or Parquet
+    y_test_csv = os.path.join(input_path, "y_test.csv")
+    y_test_parquet = os.path.join(input_path, "y_test.parquet")
+    if os.path.exists(y_test_parquet):
+        y_test = pd.read_parquet(y_test_parquet)
+    elif os.path.exists(y_test_csv):
+        y_test = pd.read_csv(y_test_csv)
+    else:
+        raise FileNotFoundError(f"Could not find y_test.csv or y_test.parquet in {input_path}")
+    
+    y_pred_csv = os.path.join(input_path, "y_predicted.csv")
+    y_pred_parquet = os.path.join(input_path, "y_predicted.parquet")
+    if os.path.exists(y_pred_parquet):
+        y_pred = pd.read_parquet(y_pred_parquet)
+    elif os.path.exists(y_pred_csv):
+        y_pred = pd.read_csv(y_pred_csv)
+    else:
+        raise FileNotFoundError(f"Could not find y_predicted.csv or y_predicted.parquet in {input_path}")
 
     with open(decoder_path) as json_file:
         decoder = json.load(json_file)

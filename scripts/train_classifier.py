@@ -40,8 +40,21 @@ def train(
     # Read the data
     print("INFO: Loading data")
     print("INFO: Measurement file: {}".format(input_file))
-    X = pd.read_csv(input_file)
-    y = pd.read_csv(labels_file)
+    
+    # Auto-detect file format and read accordingly
+    if input_file.endswith('.parquet'):
+        X = pd.read_parquet(input_file)
+    elif input_file.endswith('.csv'):
+        X = pd.read_csv(input_file)
+    else:
+        raise ValueError(f"Unsupported input file format. Expected .csv or .parquet, got: {input_file}")
+    
+    if labels_file.endswith('.parquet'):
+        y = pd.read_parquet(labels_file)
+    elif labels_file.endswith('.csv'):
+        y = pd.read_csv(labels_file)
+    else:
+        raise ValueError(f"Unsupported labels file format. Expected .csv or .parquet, got: {labels_file}")
 
     # Preprocess
     print("INFO: Preprocessing")
@@ -50,10 +63,18 @@ def train(
         X, transform_scheme=preprocess_scheme, args=preprocess_options
     )
 
+    # Determine output format based on input format
+    use_parquet = input_file.endswith('.parquet') or labels_file.endswith('.parquet')
+    
     if save_preprocessed_data:
-        X.to_csv(
-            os.path.join(full_output_directory, "preprocessed_data.csv"), index=False
-        )
+        if use_parquet:
+            X.to_parquet(
+                os.path.join(full_output_directory, "preprocessed_data.parquet"), index=False
+            )
+        else:
+            X.to_csv(
+                os.path.join(full_output_directory, "preprocessed_data.csv"), index=False
+            )
 
     # Tune the hyperparameters
     print("INFO: Tuning hyperparameters")
@@ -62,15 +83,26 @@ def train(
 
     # get predictions
     print("INFO: Save the predictions")
-    classifier_applier.get_prediction_df().to_csv(
-        os.path.join(full_output_directory, "y_predicted.csv"), index=False
-    )
-    classifier_applier.y_train_orig.to_csv(
-        os.path.join(full_output_directory, "y_train.csv"), index=False
-    )
-    classifier_applier.y_test.to_csv(
-        os.path.join(full_output_directory, "y_test.csv"), index=False
-    )
+    if use_parquet:
+        classifier_applier.get_prediction_df().to_parquet(
+            os.path.join(full_output_directory, "y_predicted.parquet"), index=False
+        )
+        classifier_applier.y_train_orig.to_parquet(
+            os.path.join(full_output_directory, "y_train.parquet"), index=False
+        )
+        classifier_applier.y_test.to_parquet(
+            os.path.join(full_output_directory, "y_test.parquet"), index=False
+        )
+    else:
+        classifier_applier.get_prediction_df().to_csv(
+            os.path.join(full_output_directory, "y_predicted.csv"), index=False
+        )
+        classifier_applier.y_train_orig.to_csv(
+            os.path.join(full_output_directory, "y_train.csv"), index=False
+        )
+        classifier_applier.y_test.to_csv(
+            os.path.join(full_output_directory, "y_test.csv"), index=False
+        )
 
     # Save the outputs
     print("INFO: Save the cross validation results")

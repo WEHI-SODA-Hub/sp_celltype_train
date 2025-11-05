@@ -32,18 +32,16 @@
                     "type": "string",
                     "format": "file-path",
                     "exists": true,
-                    "mimetype": "text/csv",
-                    "pattern": "^\\S+\\.csv$",
-                    "description": "Path to comma-separated file containing information about the samples in the experiment. E.g., /home/users/allstaff/<username>/batch1_preprocessed_input_data.csv",
-                    "fa_icon": "fas fa-file-csv"
+                    "pattern": "^\\S+\\.(csv|parquet)$",
+                    "description": "Path to CSV or Parquet file containing preprocessed input data. E.g., /home/users/allstaff/<username>/batch1_preprocessed_input_data.csv or batch1_preprocessed_input_data.parquet",
+                    "fa_icon": "fas fa-file"
                 },
                 "label_file": {
                     "type": "string",
-                    "description": "File containing cell type labels. E.g., /home/users/allstaff/<username>/batch1_cell_type_labels.csv",
-                    "fa_icon": "fas fa-file-csv",
-                    "pattern": "^\\S+\\.csv$",
-                    "format": "file-path",
-                    "mimetype": "text/csv"
+                    "description": "File containing cell type labels (CSV or Parquet). E.g., /home/users/allstaff/<username>/batch1_cell_type_labels.csv or batch1_cell_type_labels.parquet",
+                    "fa_icon": "fas fa-file",
+                    "pattern": "^\\S+\\.(csv|parquet)$",
+                    "format": "file-path"
                 },
                 "output_path": {
                     "type": "string",
