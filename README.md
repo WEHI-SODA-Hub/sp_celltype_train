@@ -1,7 +1,7 @@
-# MIBI Train Model Pipeline
+# SODA-Classify-Train-Model Pipeline
 
-This Nextflow pipeline is a sub-pipeline in the MIBI suite. It is used to train an XGBoost model
-on preprocessed QuPath data. This README contains WEHI-specific as well as general usage 
+This Nextflow pipeline is a sub-pipeline in the SODA-Classify suite for Spatial Proteomics. It is used to train an XGBoost model
+on preprocessed output QuPath data or cell marker measurements in tabular format. This README contains WEHI-specific as well as general usage 
 instructions.
 
 ## Introduction
