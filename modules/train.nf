@@ -7,8 +7,10 @@ process TRAIN {
 
 	memory "100 GB"
 	cpus 56
+	conda "${projectDir}/envs/environment.yml"
 	time "${params.walltime}"
 	label "train"
+	container "oras://ghcr.io/wehi-researchcomputing/mibi:0.1"
 
 	input:
 	path script

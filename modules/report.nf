@@ -10,6 +10,7 @@ process REPORT {
     time "30min"
     label "report"
     publishDir "${params.output_path}", mode: 'copy'
+    container "oras://ghcr.io/wehi-researchcomputing/mibi:0.1"
 
     input:
     path input_data
