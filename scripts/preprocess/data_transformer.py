@@ -12,6 +12,7 @@ class DataTransformer:
         self.valid_scheme = {
             "logp1": self.logp1_transform,
             "poly": self.polyfeatures_transform,
+            "percentile": self.percentile_transform,
         }
 
     def transform_data(
@@ -36,7 +37,41 @@ class DataTransformer:
         print()
         df = pd.DataFrame(FunctionTransformer(np.log1p).fit_transform(X))
         df.columns = "Logp1 Transformer: " + X.columns
-        return X
+        return df
+
+    def percentile_transform(self, X: pd.DataFrame, args=None) -> pd.DataFrame:
+        """
+        Percentile normalization: clips values to specified percentiles and scales to [0, 1].
+        Default: 1st percentile -> 0, 99th percentile -> 1
+        
+        Args:
+            X: Input dataframe
+            args: Optional dict with 'lower_percentile' (default 1) and 'upper_percentile' (default 99)
+        """
+        lower_percentile = args.get("lower_percentile", 1) if args else 1
+        upper_percentile = args.get("upper_percentile", 99) if args else 99
+        
+        print(f"INFO: Applying percentile normalization (p{lower_percentile} -> 0, p{upper_percentile} -> 1)")
+        
+        df = X.copy()
+        
+        # Calculate percentiles for each column
+        lower_bounds = df.quantile(lower_percentile / 100.0, axis=0)
+        upper_bounds = df.quantile(upper_percentile / 100.0, axis=0)
+        
+        # Clip values to percentile range
+        df = df.clip(lower=lower_bounds, upper=upper_bounds, axis=1)
+        
+        # Scale to [0, 1] range
+        # Handle case where lower == upper (constant column)
+        range_vals = upper_bounds - lower_bounds
+        range_vals = range_vals.replace(0, 1)  # Avoid division by zero
+        
+        df = (df - lower_bounds) / range_vals
+        
+        df.columns = f"Percentile (p{lower_percentile}-p{upper_percentile}): " + X.columns
+        
+        return df
 
     def polyfeatures_transform(self, X: pd.DataFrame, args: Dict) -> pd.DataFrame:
         """
